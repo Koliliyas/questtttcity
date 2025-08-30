@@ -1,0 +1,39 @@
+# Конфигурация развертывания QuestCity на Timeweb Cloud
+# 
+# Сервисы:
+# - VDS сервер для бэкенда
+# - Облачная база данных PostgreSQL
+# - Объектное хранилище S3
+
+# Настройки VDS сервера
+vds_config:
+  os: "Ubuntu 22.04 LTS"
+  cpu: 2
+  ram: 4
+  disk: 80
+  network: "public"
+
+# Настройки базы данных
+database_config:
+  type: "postgresql"
+  version: "16"
+  cpu: 1
+  ram: 2
+  disk: 20
+  backup_enabled: true
+
+# Настройки S3 хранилища
+s3_config:
+  bucket_name: "questcity-storage"
+  region: "ru-1"
+  versioning: true
+  lifecycle_policy: "30_days"
+
+# Настройки домена и SSL
+domain_config:
+  domain: "api.questcity.yourdomain.com"
+  ssl: true
+  redirect_www: false
+
+
+

@@ -1,0 +1,14 @@
+stages:
+  - deploy
+services:
+    - docker:dind
+deploy:
+  stage: deploy
+  image: kroniak/ssh-client
+  script:
+    - mkdir ~/.ssh
+    - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
+    - echo "cd /home/app/questcity/ && git pull && docker compose up -d --build backend" | ssh -o "StrictHostKeyChecking no" -T root@questcity.tw1.su bash
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
