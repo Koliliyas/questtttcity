@@ -19,3 +19,34 @@ crontab -l 2>/dev/null | { cat; echo "0 12 * * * /usr/bin/certbot renew --quiet"
 echo "✅ SSL сертификат настроен!"
 echo "🔍 Проверьте: https://questcity.ru"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

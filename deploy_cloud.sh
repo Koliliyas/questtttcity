@@ -143,3 +143,34 @@ echo "🌐 Проверьте:"
 echo "   HTTP:  http://questcity.ru/api/v1/health/"
 echo "   HTTPS: https://questcity.ru/api/v1/health/"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

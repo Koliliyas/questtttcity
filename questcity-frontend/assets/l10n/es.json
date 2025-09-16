@@ -305,5 +305,22 @@
 	"kTextDeleteQuestConfirmation": "¿Eliminar misión?",
 	"kTextDeleteQuestWarning": "Esta acción no se puede deshacer.",
 	"kTextCancel": "Cancelar",
-	"kTextQuestDeleted": "Misión eliminada exitosamente"
+	"kTextQuestDeleted": "Misión eliminada exitosamente",
+	"kTextGetStarted": "Comenzar",
+	"kTextQuestDetails": "Detalles de la Misión",
+	"kTextDescription": "Descripción",
+	"kTextDifficulty": "Dificultad",
+	"kTextDuration": "Duración",
+	"kTextGroupType": "Tipo de Grupo",
+	"kTextVehicle": "Vehículo",
+	"kTextMileage": "Kilometraje",
+	"kTextPrice": "Precio",
+	"kTextReward": "Recompensa",
+	"kTextCost": "Costo",
+	"kTextRating": "Calificación",
+	"kTextMentorPreference": "Preferencia del Mentor",
+	"kTextMerchandise": "Mercancía",
+	"kTextNoPointsAvailable": "No hay puntos disponibles para esta búsqueda",
+	"kTextNoMerchandiseAvailable": "No hay mercancía disponible para esta búsqueda",
+	"kTextNoReviewsAvailable": "No hay reseñas disponibles para esta búsqueda"
 }

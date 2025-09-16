@@ -1,0 +1,53 @@
+services:
+  backend:
+    container_name: backend
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/code
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    container_name: database
+    image: postgres:16
+    restart: always
+    volumes:
+      - api_postgres:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    env_file: ".env"
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+  minio:
+    container_name: minio-storage
+    image: minio/minio:latest
+    restart: always
+    command: server --console-address ":9001" /data/
+    environment:
+      MINIO_ROOT_USER: ${S3_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${S3_ROOT_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - api_minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+      
+volumes:
+  api_postgres:
+  api_minio:

@@ -281,25 +281,39 @@ async def update_quest(
     
     existing_quest = quest_obj.ok()
     
-    # Создаем DTO для обновления с существующими значениями по умолчанию
+    # Отладочная информация
+    print(f"DEBUG: quest_data.credits = {quest_data.credits}")
+    print(f"DEBUG: quest_data.main_preferences = {quest_data.main_preferences}")
+    if quest_data.credits:
+        print(f"DEBUG: credits.auto = {quest_data.credits.auto}")
+        print(f"DEBUG: credits.cost = {quest_data.credits.cost}")
+        print(f"DEBUG: credits.reward = {quest_data.credits.reward}")
+    if quest_data.main_preferences:
+        print(f"DEBUG: main_preferences.category_id = {quest_data.main_preferences.category_id}")
+        print(f"DEBUG: main_preferences.group = {quest_data.main_preferences.group}")
+        print(f"DEBUG: main_preferences.timeframe = {quest_data.main_preferences.timeframe}")
+    
+    # Создаем DTO для обновления с правильной обработкой main_preferences
     quest_update_dto = QuestUpdateDTO(
         id=quest_id,
         name=quest_data.name or existing_quest.name,
         description=quest_data.description or existing_quest.description,
         image=quest_data.image or existing_quest.image,
         mentor_preference=quest_data.mentor_preference or existing_quest.mentor_preference,
-        auto_accrual=existing_quest.auto_accrual,
-        cost=existing_quest.cost,
-        reward=existing_quest.reward,
-        is_subscription=existing_quest.is_subscription,
-        pay_extra=existing_quest.pay_extra,
-        level=existing_quest.level,
-        milage=existing_quest.milage,
-        category_id=existing_quest.category_id,
-        vehicle_id=existing_quest.vehicle_id,
-        place_id=existing_quest.place_id,
-        group=existing_quest.group,
-        timeframe=existing_quest.timeframe,
+        # Используем данные из credits если они есть, иначе существующие значения
+        auto_accrual=quest_data.credits.auto if quest_data.credits else existing_quest.auto_accrual,
+        cost=quest_data.credits.cost if quest_data.credits else existing_quest.cost,
+        reward=quest_data.credits.reward if quest_data.credits else existing_quest.reward,
+        # Используем данные из main_preferences если они есть, иначе существующие значения
+        is_subscription=quest_data.main_preferences.price_settings.is_subscription if quest_data.main_preferences and hasattr(quest_data.main_preferences, 'price_settings') and quest_data.main_preferences.price_settings else existing_quest.is_subscription,
+        pay_extra=quest_data.main_preferences.price_settings.amount if quest_data.main_preferences and hasattr(quest_data.main_preferences, 'price_settings') and quest_data.main_preferences.price_settings else existing_quest.pay_extra,
+        level=quest_data.main_preferences.level if quest_data.main_preferences else existing_quest.level,
+        milage=quest_data.main_preferences.mileage if quest_data.main_preferences else existing_quest.milage,
+        category_id=quest_data.main_preferences.category_id if quest_data.main_preferences else existing_quest.category_id,
+        vehicle_id=quest_data.main_preferences.vehicle_id if quest_data.main_preferences else existing_quest.vehicle_id,
+        place_id=quest_data.main_preferences.place_id if quest_data.main_preferences else existing_quest.place_id,
+        group=quest_data.main_preferences.group if quest_data.main_preferences else existing_quest.group,
+        timeframe=quest_data.main_preferences.timeframe if quest_data.main_preferences else existing_quest.timeframe,
     )
 
     # Подготавливаем DTO для мерча
@@ -638,6 +652,87 @@ async def get_quest_diagnostic_schema(
 #             "quest_id": quest_id
 #         } 
 
+
+@router.get("/user/{quest_id}")
+@inject
+async def get_user_quest_detail(
+    quest_id: int,
+    quest_service: Injected[QuestService],
+    user: User = Depends(require_view_quests)
+):
+    """Получение детальной информации о квесте для пользователей."""
+    try:
+        quest_result = await quest_service.get_quest_by_id(quest_id)
+        
+        if isinstance(quest_result, Err):
+            return {"error": "Quest not found", "quest_id": quest_id}
+        
+        quest = quest_result.ok()
+        
+        # Получаем связанные данные
+        merch_list = await quest_service.get_merch_list_by_quest_id(quest_id)
+        preferences = await quest_service.get_preferences_by_quest_id(quest_id)
+        points = await quest_service.get_quest_points_list(quest_id)
+        places = await quest_service.get_places_by_quest_id(quest_id)
+        place_settings = await quest_service.get_place_settings_by_quest_id(quest_id)
+        
+        # Получаем отзывы (пока пустой список, можно добавить позже)
+        reviews = []
+        
+        # Безопасно получаем Enum значения
+        try:
+            level_value = quest.level.value if quest.level else "beginner"
+        except:
+            level_value = "beginner"
+        
+        try:
+            timeframe_value = quest.timeframe.value if quest.timeframe else "halfDay"
+        except:
+            timeframe_value = "halfDay"
+        
+        try:
+            group_value = quest.group.value if quest.group else 1
+        except:
+            group_value = 1
+        
+        try:
+            mileage_value = quest.milage.value if quest.milage else "local"
+        except:
+            mileage_value = "local"
+        
+        # Возвращаем данные в формате, совместимом с фронтендом
+        return {
+            "id": quest.id,
+            "name": quest.name or "Без названия",
+            "description": quest.description or "Описание не указано",
+            "image": quest.image or "default.jpg",
+            "rating": float(quest.rating) if hasattr(quest, 'rating') and quest.rating else 0.0,
+            "merch": merch_list,
+            "credits": {
+                "auto": quest.auto_accrual or False,
+                "cost": quest.cost if quest.cost is not None else 0,
+                "reward": quest.reward if quest.reward is not None else 0,
+            },
+            "mentor_preference": quest.mentor_preference or "",
+            "mainPreferences": {
+                "categoryId": quest.category_id,
+                "group": group_value,
+                "vehicleId": quest.vehicle_id,
+                "price": {
+                    "isSubscription": quest.is_subscription or False,
+                    "amount": quest.pay_extra or 0,
+                },
+                "timeframe": timeframe_value,
+                "level": level_value,
+                "mileage": mileage_value,
+                "placeId": quest.place_id,
+            },
+            "points": points,
+            "reviews": reviews
+        }
+        
+    except Exception as e:
+        return {"error": f"Internal server error: {str(e)}", "quest_id": quest_id}
 
 @router.get("/get-quest/{quest_id}")
 @inject
@@ -1067,13 +1162,15 @@ async def update_admin_quest(
         group=quest_data.main_preferences.group,
         cost=quest_data.credits.cost,
         reward=quest_data.credits.reward,
-        pay_extra=0,  # TODO: Добавить в схему
-        is_subscription=False,  # TODO: Добавить в схему
+        # Используем данные из main_preferences.price_settings если они есть, иначе значения по умолчанию
+        pay_extra=quest_data.main_preferences.price_settings.amount if hasattr(quest_data.main_preferences, 'price_settings') and quest_data.main_preferences.price_settings else 0,
+        is_subscription=quest_data.main_preferences.price_settings.is_subscription if hasattr(quest_data.main_preferences, 'price_settings') and quest_data.main_preferences.price_settings else False,
         vehicle_id=quest_data.main_preferences.vehicle_id,
         place_id=quest_data.main_preferences.place_id,
         milage=quest_data.main_preferences.mileage,
         mentor_preference=quest_data.mentor_preference,
-        auto_accrual=False,  # TODO: Добавить в схему
+        # Используем данные из credits.auto если они есть, иначе значение по умолчанию
+        auto_accrual=quest_data.credits.auto if hasattr(quest_data, 'credits') and quest_data.credits else False,
     )
     
     # Создаем DTO для мерча

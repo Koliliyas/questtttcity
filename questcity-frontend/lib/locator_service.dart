@@ -15,6 +15,7 @@ import 'package:los_angeles_quest/features/data/datasources/chat_remote_data_sou
 import 'package:los_angeles_quest/features/data/datasources/file_remote_data_source_impl.dart';
 import 'package:los_angeles_quest/features/data/datasources/person_remote_data_source_impl.dart';
 import 'package:los_angeles_quest/features/data/datasources/quest_remote_data_source_impl.dart';
+import 'package:los_angeles_quest/features/data/datasources/quest_detail_remote_data_source.dart';
 import 'package:los_angeles_quest/features/data/datasources/unlock_requests_datasource.dart';
 import 'package:los_angeles_quest/features/data/datasources/user_remote_data_source_impl.dart';
 import 'package:los_angeles_quest/features/data/datasources/web_socket_remote_data_source_impl.dart';
@@ -26,6 +27,7 @@ import 'package:los_angeles_quest/features/data/repositories/file_repository_imp
 import 'package:los_angeles_quest/features/data/repositories/friends_repository.dart';
 import 'package:los_angeles_quest/features/data/repositories/person_repository_impl.dart';
 import 'package:los_angeles_quest/features/data/repositories/quest_repository_impl.dart';
+import 'package:los_angeles_quest/features/data/repositories/quest_detail_repository_impl.dart';
 import 'package:los_angeles_quest/features/data/repositories/unlock_request_repository.dart';
 import 'package:los_angeles_quest/features/data/repositories/user_repository_impl.dart';
 import 'package:los_angeles_quest/features/data/repositories/web_socket_repository_impl.dart';
@@ -36,6 +38,7 @@ import 'package:los_angeles_quest/features/domain/repositories/chat_repository.d
 import 'package:los_angeles_quest/features/domain/repositories/file_repository.dart';
 import 'package:los_angeles_quest/features/domain/repositories/person_repository.dart';
 import 'package:los_angeles_quest/features/domain/repositories/quest_repository.dart';
+import 'package:los_angeles_quest/features/domain/repositories/quest_detail_repository.dart';
 import 'package:los_angeles_quest/features/domain/repositories/user_repository.dart';
 import 'package:los_angeles_quest/features/domain/repositories/web_socket_repository.dart';
 import 'package:los_angeles_quest/features/domain/usecases/auth/auth_login.dart';
@@ -78,6 +81,7 @@ import 'package:los_angeles_quest/features/domain/usecases/quest/get_prices.dart
 import 'package:los_angeles_quest/features/domain/usecases/quest/get_quest.dart';
 import 'package:los_angeles_quest/features/domain/usecases/quest/update_quest.dart';
 import 'package:los_angeles_quest/features/domain/usecases/quest/get_vehicles.dart';
+import 'package:los_angeles_quest/features/domain/usecases/quest/get_quest_detail.dart';
 import 'package:los_angeles_quest/features/domain/usecases/quest/delete_quest.dart';
 import 'package:los_angeles_quest/features/domain/usecases/quest/get_quest_analytics.dart';
 import 'package:los_angeles_quest/features/domain/usecases/quest/bulk_action_quests.dart';
@@ -91,7 +95,6 @@ import 'package:los_angeles_quest/features/presentation/pages/admin/category_cre
 import 'package:los_angeles_quest/features/presentation/pages/admin/users_screen/cubit/users_screen_cubit.dart';
 import 'package:los_angeles_quest/features/presentation/pages/admin/quests_list_screen/cubit/quests_list_screen_cubit.dart';
 import 'package:los_angeles_quest/features/presentation/pages/admin/quest_create_screen/cubit/quest_create_screen_cubit.dart';
-import 'package:los_angeles_quest/features/presentation/pages/admin/quest_edit_screen/cubit/quest_edit_screen_cubit.dart';
 import 'package:los_angeles_quest/features/presentation/pages/admin/quests_analytics_screen/cubit/quests_analytics_screen_cubit.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/account/cubit/account_screen_cubit.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/chat/chat_screen/cubit/chat_screen_cubit.dart';
@@ -204,16 +207,8 @@ Future<void> init() async {
         uploadFileUC: sl.get<UploadFile>(),
       ));
 
-  sl.registerFactory<QuestEditScreenCubit>(() => QuestEditScreenCubit(
-        questId: 0, // Будет передан через параметры
-        getLevelsUC: sl.get<GetLevels>(),
-        getPlacesUC: sl.get<GetPlaces>(),
-        getPricesUC: sl.get<GetPrices>(),
-        getMilesUC: sl.get<GetMiles>(),
-        getVehiclesUC: sl.get<GetVehicles>(),
-        updateQuestUC: sl.get<UpdateQuest>(),
-        getQuestUC: sl.get<GetQuestAdmin>(),
-      ));
+  // QuestEditScreenCubit не регистрируем в DI, так как questId должен передаваться через параметры
+  // sl.registerFactory<QuestEditScreenCubit>(() => QuestEditScreenCubit(...));
   sl.registerFactory(() => EditQuestScreenCubit(
         getLevelsUC: sl<GetLevels>(),
         getMilesUC: sl<GetMiles>(),
@@ -284,6 +279,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetPrices(sl<QuestRepository>()));
   sl.registerLazySingleton(() => GetVehicles(sl<QuestRepository>()));
   sl.registerLazySingleton(() => GetMiles(sl<QuestRepository>()));
+  sl.registerLazySingleton(() => GetQuestDetail(sl<QuestDetailRepository>()));
   sl.registerLazySingleton(
       () => WebSocketSendMessage(sl<WebSocketRepository>()));
   sl.registerLazySingleton(
@@ -353,6 +349,11 @@ Future<void> init() async {
       networkInfo: sl<NetworkInfo>(),
     ),
   );
+  sl.registerLazySingleton<QuestDetailRepository>(
+    () => QuestDetailRepositoryImpl(
+      sl<QuestDetailRemoteDataSource>(),
+    ),
+  );
 
   // New Auth Repository
   sl.registerLazySingleton<AuthRepositoryNew>(
@@ -399,6 +400,9 @@ Future<void> init() async {
   sl.registerLazySingleton<QuestRemoteDataSource>(
     () => QuestRemoteDataSourceImpl(
         client: sl<http.Client>(), secureStorage: sl<FlutterSecureStorage>()),
+  );
+  sl.registerLazySingleton<QuestDetailRemoteDataSource>(
+    () => QuestDetailRemoteDataSource(),
   );
 
   // Core

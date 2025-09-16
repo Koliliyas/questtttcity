@@ -29,6 +29,7 @@ class UiConstants {
   static const Color lightGreyColor = Color(0xFFBDBDBD); // #CDCDCD, #D9D9D9
   static const Color darkVioletColor = Color(0xFF4A1176);
   static const Color darkGreenColor = Color(0xFF1E440C);
+  static const Color blueColor = Color(0xFF2196F3);
 
   // TEXT STYLES
 

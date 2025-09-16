@@ -25,6 +25,8 @@ import 'package:los_angeles_quest/features/presentation/pages/admin/quest_edit_s
 import 'package:los_angeles_quest/features/presentation/pages/common/account/account_screen.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/chat/chat_screen/chat_screen.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/quest/quest_screen.dart';
+import 'package:los_angeles_quest/features/presentation/pages/common/quest_detail/quest_detail_screen.dart';
+import 'package:los_angeles_quest/features/data/models/quests/quest_list_model.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/quest/reviews_screen/reviews_screen.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/quest/see_a_map_screen.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/quests/my_quests_screen/my_quests_screen.dart';
@@ -212,6 +214,16 @@ class MyApp extends StatelessWidget {
                           mileage: '',
                           cubit: CompletingQuestScreenCubit(sl()),
                         ),
+                    Routes.questDetailScreen: (context) {
+                      final args = ModalRoute.of(context)?.settings.arguments
+                          as Map<String, dynamic>?;
+                      final questId = args?['questId'] ?? 1;
+                      final questItem = args?['questItem'] as QuestItem?;
+                      return QuestDetailScreen(
+                        questId: questId,
+                        questItem: questItem,
+                      );
+                    },
                     // Тестовые маршруты удалены после завершения миграции
                   },
                   initialRoute: Routes.splashScreen,

@@ -33,6 +33,7 @@ class Routes {
   static const String artifactsScreen = '/artifacts_screen';
   static const String toolsScreen = '/tools_screen';
   static const String orbitalRadarScreen = '/orbital_radar_screen';
+  static const String questDetailScreen = '/quest_detail_screen';
   // Тестовые маршруты удалены после завершения миграции
 
   static List<String> get allRoutes => [
@@ -67,6 +68,7 @@ class Routes {
         artifactsScreen,
         toolsScreen,
         orbitalRadarScreen,
+        questDetailScreen,
         // Тестовые маршруты удалены
       ];
 }

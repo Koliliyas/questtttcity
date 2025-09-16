@@ -346,4 +346,21 @@ class LocaleKeys {
   static const String kTextHistory = 'kTextHistory';
   static const String kTextQuestPoints = 'kTextQuestPoints';
   static const String kTextQuestUpdateError = 'kTextQuestUpdateError';
+
+  // Quest detail screen keys
+  static const String kTextGetStarted = 'kTextGetStarted';
+  static const String kTextQuestDetails = 'kTextQuestDetails';
+  static const String kTextDescription = 'kTextDescription';
+  static const String kTextDifficulty = 'kTextDifficulty';
+  static const String kTextDuration = 'kTextDuration';
+  static const String kTextMileage = 'kTextMileage';
+  static const String kTextReward = 'kTextReward';
+  static const String kTextCost = 'kTextCost';
+  static const String kTextRating = 'kTextRating';
+  static const String kTextMentorPreference = 'kTextMentorPreference';
+  static const String kTextMerchandise = 'kTextMerchandise';
+  static const String kTextNoPointsAvailable = 'kTextNoPointsAvailable';
+  static const String kTextNoMerchandiseAvailable =
+      'kTextNoMerchandiseAvailable';
+  static const String kTextNoReviewsAvailable = 'kTextNoReviewsAvailable';
 }

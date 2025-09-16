@@ -7,7 +7,6 @@ import 'package:los_angeles_quest/constants/ui_constants.dart';
 import 'package:los_angeles_quest/core/fade_in_route.dart';
 import 'package:los_angeles_quest/core/routes.dart';
 import 'package:los_angeles_quest/features/data/models/quests/quest_list_model.dart';
-import 'package:los_angeles_quest/features/presentation/pages/common/quest/quest_screen.dart';
 import 'package:los_angeles_quest/features/presentation/pages/admin/quest_edit_screen/quest_edit_screen.dart';
 import 'package:los_angeles_quest/features/presentation/widgets/gradient_card.dart';
 import 'package:los_angeles_quest/features/presentation/pages/common/quests/quests_screen/quests_screen_controller.dart';
@@ -34,13 +33,13 @@ class QuestItemWidget extends StatelessWidget {
     return Stack(
       children: [
         GradientCard(
-          onTap: () => Navigator.push(
+          onTap: () => Navigator.pushNamed(
             context,
-            FadeInRoute(
-                QuestScreen(
-                  questId: questItem.id,
-                ),
-                Routes.questScreen),
+            Routes.questDetailScreen,
+            arguments: {
+              'questId': questItem.id,
+              'questItem': questItem,
+            },
           ),
           height: height ?? 203.h,
           contentPadding: EdgeInsets.zero,

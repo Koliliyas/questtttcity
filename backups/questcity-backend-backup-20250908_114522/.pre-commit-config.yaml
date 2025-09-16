@@ -1,0 +1,106 @@
+# Pre-commit configuration for QuestCity Backend
+# See https://pre-commit.com for more information
+
+repos:
+  # Ruff для linting и форматирования
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.7.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        name: ruff-lint
+        description: "Run ruff linter"
+      - id: ruff-format
+        name: ruff-format
+        description: "Run ruff formatter"
+
+  # isort для сортировки импортов
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort
+        description: "Sort imports"
+        args: ["--profile", "black", "--line-length", "88"]
+
+  # MyPy для проверки типов
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.12.0
+    hooks:
+      - id: mypy
+        name: mypy
+        description: "Run mypy type checker"
+        args: [--config-file=mypy.ini]
+        additional_dependencies:
+          - types-PyYAML
+          - types-requests
+          - sqlalchemy[mypy]
+          - pydantic
+        exclude: ^(migrations/|tests/|__pycache__/)
+
+  # Базовые проверки
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim-whitespace
+        description: "Trim trailing whitespace"
+      - id: end-of-file-fixer
+        name: fix-line-endings
+        description: "Ensure files end with newline"
+      - id: check-yaml
+        name: check-yaml
+        description: "Check YAML syntax"
+      - id: check-toml
+        name: check-toml
+        description: "Check TOML syntax"
+      - id: check-json
+        name: check-json
+        description: "Check JSON syntax"
+      - id: check-merge-conflict
+        name: check-merge-conflict
+        description: "Check for merge conflict markers"
+      - id: check-added-large-files
+        name: check-large-files
+        description: "Check for large files"
+        args: [--maxkb=1000]
+      - id: debug-statements
+        name: debug-statements
+        description: "Check for debug statements"
+
+  # Проверка безопасности
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        name: bandit
+        description: "Run bandit security linter"
+        args: ["-r", "src/", "-x", "src/tests/"]
+        exclude: ^(migrations/|tests/)
+
+  # Проверка Python docstrings
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: pydocstyle
+        description: "Check docstring conventions"
+        args: [--convention=google]
+        exclude: ^(migrations/|tests/|__pycache__/)
+
+# Глобальные настройки
+default_stages: [commit]
+fail_fast: false
+
+# Настройки для конкретных хуков
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false 

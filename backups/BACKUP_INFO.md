@@ -1,6 +1,20 @@
 # Questcity Backups Information
 
-## Latest Backup: 2025-08-14 14:56:45
+## Latest Backup: 2025-09-08 11:45:22
+
+### Backend Backup
+- **Directory:** `questcity-backend-backup-20250908_114522/`
+- **Date:** September 8, 2025
+- **Time:** 11:45:22
+- **Status:** ✅ Completed
+
+### Frontend Backup  
+- **Directory:** `questcity-frontend-backup-20250908_114522/`
+- **Date:** September 8, 2025
+- **Time:** 11:45:22
+- **Status:** ✅ Completed
+
+## Previous Backup: 2025-08-14 14:56:45
 
 ### Backend Backup
 - **Directory:** `questcity-backend-backup-20250814_145645/`
